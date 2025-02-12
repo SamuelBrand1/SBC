@@ -2,3 +2,11 @@ name = "SBC"
 uuid = "07f52da8-c960-407f-a7f8-dbf8e7cde109"
 authors = ["Samuel Brand <48288458+SamuelBrand1@users.noreply.github.com>"]
 version = "0.1.0"
+
+[deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+HypothesisTests = "09f84164-cd44-5f33-b23f-e6b0d136a0d5"
+
+[compat]
+Distributions = "0.25.117"
+HypothesisTests = "0.11.3"
