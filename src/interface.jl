@@ -6,6 +6,10 @@ function run_primary_generative end
 Base method for running the secondary/conditional generative model.
 """
 function run_secondary_generative end
+"""
+Base method for running the simulation-based calibration (SBC).
+"""
+function run_comparison end
 
 components = (
     mandatory = (
@@ -19,6 +23,10 @@ components = (
         run_secondary_generative = (
             "Secondary generative model returns a `Tuple` or `NamedTuple`" => args::Arguments -> run_secondary_generative(
             args.model, args.primary_sample, args.n) isa Union{Tuple, NamedTuple},
+        ),
+        run_comparison = (
+            "Comparison method returns a `Tuple` or `NamedTuple`" => args::Arguments -> run_comparison(
+            args.model, args.n, args.n_comparisons) isa Union{Tuple, NamedTuple},
         )
     ),
     optional = (;)
