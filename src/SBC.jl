@@ -14,7 +14,7 @@ export uniformity_test
 export SBCInterface
 
 # Methods
-export run_primary_generative, run_secondary_generative
+export run_primary_generative, run_secondary_generative, run_comparison
 
 include("docstrings.jl")
 include("types.jl")
