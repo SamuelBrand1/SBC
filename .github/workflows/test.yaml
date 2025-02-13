@@ -6,16 +6,16 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: true
       matrix:
-        julia-version: [stable, lts]
-        julia-arch: [x64, x86]
+        julia-version: ['1']
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        exclude:
-          - os: macOS-latest
-            julia-arch: x86
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: SBC
+          sparse-checkout-cone-mode: false
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
