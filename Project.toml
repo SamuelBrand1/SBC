@@ -9,9 +9,16 @@ DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 HypothesisTests = "09f84164-cd44-5f33-b23f-e6b0d136a0d5"
 Interfaces = "85a1e053-f937-4924-92a5-1367d23b7b87"
 
+[weakdeps]
+Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
+
+[extensions]
+TuringExt = "Turing"
+
 [compat]
 Distributions = "0.25.117"
 DocStringExtensions = "0.9.3"
 HypothesisTests = "0.11.3"
 Interfaces = "0.3.2"
+Turing = "0.36.2"
 julia = "1.11"
