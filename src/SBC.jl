@@ -1,5 +1,6 @@
 module SBC
-using Distributions, HypothesisTests
-greet() = print("Hello World!")
+using Distributions, HypothesisTests, DocStringExtensions
+
+include("docstrings.jl")
 
 end
