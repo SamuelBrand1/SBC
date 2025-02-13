@@ -1,6 +1,10 @@
 name: Run tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   test:
@@ -13,9 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: SBC
-          sparse-checkout-cone-mode: false
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
