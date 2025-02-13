@@ -11,13 +11,13 @@ components = (
     mandatory = (
         run_primary_generative = (
             "Primary generative model returns a `Tuple`" => args::Arguments -> run_primary_generative(args.model) isa
-                                                                               Union{
-                Tuple, NamedTuple},
-            "Primary generative model returns two elements" => args::Arguments -> length(run_primary_generative(args.model)) ==
-                                                                                  2
+                                                                               NamedTuple,
+            "Primary generative model has two keys: `(:primary_target, :primary_sample)`" => args::Arguments -> keys(run_primary_generative(args.model)) ==
+                                                                                                                (
+                :primary_target, :primary_sample)
         ),
         run_secondary_generative = (
-            "Secondary generative model returns a `Tuple`" => args::Arguments -> run_secondary_generative(
+            "Secondary generative model returns a `Tuple` or `NamedTuple`" => args::Arguments -> run_secondary_generative(
             args.model, args.primary_sample, args.n) isa Union{Tuple, NamedTuple},
         )
     ),
