@@ -10,15 +10,15 @@ function run_secondary_generative end
 components = (
     mandatory = (
         run_primary_generative = (
-            "Primary generative model returns a `Tuple`" => model -> run_primary_generative(model) isa
-                                                                     Union{
+            "Primary generative model returns a `Tuple`" => args::Arguments -> run_primary_generative(args.model) isa
+                                                                               Union{
                 Tuple, NamedTuple},
-            "Primary generative model returns two elements" => model -> length(run_primary_generative(model)) ==
-                                                                        2
+            "Primary generative model returns two elements" => args::Arguments -> length(run_primary_generative(args.model)) ==
+                                                                                  2
         ),
         run_secondary_generative = (
             "Secondary generative model returns a `Tuple`" => args::Arguments -> run_secondary_generative(
-            args.model, args.primary_sample) isa Union{Tuple, NamedTuple},
+            args.model, args.primary_sample, args.n) isa Union{Tuple, NamedTuple},
         )
     ),
     optional = (;)
