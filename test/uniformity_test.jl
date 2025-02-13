@@ -12,8 +12,8 @@
     bad_counts = rand(Poisson(n / 2), n_comparisons)
 
     # Test the good distribution
-    good_t = chisqtest(good_counts)
+    good_t = uniformity_test(good_counts, n)
     @test pvalue(good_t) > 0.05
-    bad_t = chisqtest(bad_counts)
+    bad_t = uniformity_test(bad_counts, n)
     @test pvalue(bad_t) < 0.05
 end
