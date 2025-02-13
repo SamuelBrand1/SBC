@@ -1,15 +1,10 @@
-name: Test package
+name: Run tests
 
 on:
   push:
     branches:
       - main
   pull_request:
-  merge_group:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   test:
@@ -17,18 +12,13 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        julia-version: ['1.11', '1']
+        julia-version: ['1']
         os: [ubuntu-latest, windows-latest, macOS-latest]
+
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: SBC
-          sparse-checkout-cone-mode: false
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
-      - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
-        with:
-          depwarn: 'no'
