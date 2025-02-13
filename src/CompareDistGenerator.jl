@@ -1,9 +1,10 @@
 """
 A structure that represents a generator which compares two distribution generators.
-The `primary_generator` is used to generate the primary samples, this is the target distribution.
-The `secondary_generator` is used to generate the secondary samples, this is the conditional distribution.
+The `primary_generator` is used to generate the primary samples, this generates the target distribution.
+The `secondary_generator` is used to generate the secondary samples, this is generates a (conditional)
+distribution, which we wish to compare to the target distribution.
 """
-struct CompareDistGenerator{A <: Distribution, B <: Distribution} <: AbstractDualGenerator
+struct CompareDistGenerator{A <: Sampleable, B <: Sampleable} <: AbstractDualGenerator
     primary_generator::A
     secondary_generator::B
 end
