@@ -1,18 +1,11 @@
 module SBC
-using Distributions, DocStringExtensions, HypothesisTests, Interfaces
-
-## Turing Extension
-
-ext = Base.get_extension(@__MODULE__, :TuringExt)
-if !isnothing(ext)
-    TuringSBCGenerator = ext.TuringSBCGenerator
-end
+using Distributed, Distributions, DocStringExtensions, HypothesisTests, Interfaces
 
 # Abstract types
 export AbstractDualGenerator, AbstractGenerator, AbstractTrial
 
 # Concrete types
-export CompareDistGenerator, TuringSBCGenerator
+export CompareDistGenerator
 
 # Functions
 export uniformity_test
@@ -30,7 +23,5 @@ include("types.jl")
 include("uniformity_test.jl")
 include("interface.jl")
 include("CompareDistGenerator.jl")
-
-
 
 end

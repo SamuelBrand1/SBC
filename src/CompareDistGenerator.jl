@@ -10,6 +10,13 @@ struct CompareDistGenerator{A <: Sampleable, B <: Sampleable} <: AbstractDualGen
 end
 
 """
+Method for generating a `CompareDistGenerator` instance.
+"""
+function sbc_generator(primary_generator::Sampleable, secondary_generator::Sampleable)
+    return CompareDistGenerator(primary_generator, secondary_generator)
+end
+
+"""
 Method for generating primary target values. For `CompareDistGenerator` we do not need to generate
 a sample from the primary distribution to pass to the secondary generator, only the target value.
 
@@ -57,7 +64,7 @@ statistics should be uniformly distributed on [0, 1, ..., n].
 - `Vector{Int}`: A vector containing the rank statistics for each comparison, where each element represents the count of secondary samples that are less than the primary target.
 """
 function run_comparison(generator::CompareDistGenerator, n::Int, n_comparisons::Int)
-    rank_statistics = map(1:n_comparisons) do _
+    rank_statistics = pmap(1:n_comparisons) do _
         primary = run_primary_generative(generator)
         secondary = run_secondary_generative(generator, primary.primary_sample, n)
         return sum(secondary.samples .< primary.primary_target)
