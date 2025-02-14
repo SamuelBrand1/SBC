@@ -37,9 +37,10 @@ function Random.rand!(rng::AbstractRNG, s::SampleNormal, x::Vector)
 end
 
 # Now we can define a `CompareDistGenerator` that will compare two `SampleNormal` distributions.
+# We can use the `sbc_generator` function to generate a `CompareDistGenerator` object.
 # As a first pass lets just compare two normal distributions with the same mean and variance.
 
-compare_dists = CompareDistGenerator(SampleNormal(0.0, 1.0), SampleNormal(0.0, 1.0))
+compare_dists = sbc_generator(SampleNormal(0.0, 1.0), SampleNormal(0.0, 1.0))
 n = 100
 n_comparisons = 10_000
 results = run_comparison(compare_dists, n, n_comparisons)
@@ -49,7 +50,7 @@ results.test_results
 # By contrast is we test whether the sampling distribution is different from a Cauchy distribution
 # with scale 1.0.
 
-compare_different_dists = CompareDistGenerator(SampleNormal(0.0, 1.0), Cauchy(1.0))
+compare_different_dists = sbc_generator(SampleNormal(0.0, 1.0), Cauchy(1.0))
 results_diff = run_comparison(compare_different_dists, n, n_comparisons)
 results_diff.test_results
 
