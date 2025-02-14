@@ -17,6 +17,7 @@ export SBCInterface
 export run_primary_generative, run_secondary_generative, run_comparison
 
 include("docstrings.jl")
+include("utils.jl")
 include("types.jl")
 include("uniformity_test.jl")
 include("interface.jl")
