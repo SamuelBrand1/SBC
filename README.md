@@ -1,5 +1,6 @@
 # SBC
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+![GitHub CI](https://github.com/SamuelBrand1/SBC/actions/workflows/test.yaml/badge.svg)
 
 This package provides tools for performing simulation-based calibration (SBC) on generative models.
 Out-of-the-box, it provides tools for comparing generative univariate distributions, but
@@ -36,6 +37,13 @@ function Random.rand!(rng::AbstractRNG, s::SampleNormal, x::Vector)
     @. x = s.μ + s.σ * ϵ
     return x
 end
+````
+
+````
+Precompiling SBC...
+   1077.4 ms  ✓ SBC
+  1 dependency successfully precompiled in 1 seconds. 68 already precompiled.
+
 ````
 
 Now we can define a `CompareDistGenerator` that will compare two `SampleNormal` distributions.
@@ -109,3 +117,4 @@ We do indeed see strong evidence that the two distributions are different.
 ---
 
 *This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
+
