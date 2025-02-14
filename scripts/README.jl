@@ -13,10 +13,15 @@
 # - `run_comparison`: This runs both the methods above sequentially `n_comparison` times, and gathers the rank statistics. By default these get
 # passed to the `uniformity_test` function to return a Chi-squared test result.
 
-# ## Example
-# In this example, we define a form of Normal distribution that has no distributional knowledge,
+# ## Example: Comparing two distributions via sampling
+# In this example, we will compare two distributions only by sampling from them. That is we check the
+# calibration of one sampling distribution against another "true" or target distribution, which we
+# also can only sample from.
+#
+# Towards this we define a form of Normal distribution that has no distributional knowledge,
 # but can be sampled from. We make this a subtype of the `Distributions.Sampleable` type and provide
-# the necessary methods.
+# the necessary methods. Obviously, for Normal distributions we _do_ have distributional knowledge,
+# but this is for illustrative purposes since often we may not have this knowledge.
 
 using SBC, Distributions, HypothesisTests, Random
 Random.seed!(1234)
@@ -55,3 +60,5 @@ results_diff = run_comparison(compare_different_dists, n, n_comparisons)
 results_diff.test_results
 
 # We do indeed see strong evidence that the two distributions are different.
+
+# ## Example: Comparing t
