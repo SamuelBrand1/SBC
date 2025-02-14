@@ -61,7 +61,7 @@ statistics should be uniformly distributed on [0, 1, ..., n].
 - `n_comparisons::Int`: The number of comparisons to perform.
 
 # Returns
-- `Vector{Int}`: A vector containing the rank statistics for each comparison, where each element represents the count of secondary samples that are less than the primary target.
+- A named Tuple with test results, rank statistics and the number of samples per secondary generator call.
 """
 function run_comparison(generator::CompareDistGenerator, n::Int, n_comparisons::Int)
     rank_statistics = pmap(1:n_comparisons) do _
