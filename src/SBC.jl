@@ -1,5 +1,5 @@
 module SBC
-using Distributions, DocStringExtensions, HypothesisTests, Interfaces
+using Distributed, Distributions, DocStringExtensions, HypothesisTests, Interfaces
 
 # Abstract types
 export AbstractDualGenerator, AbstractGenerator, AbstractTrial
@@ -15,8 +15,10 @@ export SBCInterface
 
 # Methods
 export run_primary_generative, run_secondary_generative, run_comparison
+export sbc_generator
 
 include("docstrings.jl")
+include("utils.jl")
 include("types.jl")
 include("uniformity_test.jl")
 include("interface.jl")

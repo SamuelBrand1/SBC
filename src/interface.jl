@@ -14,19 +14,19 @@ function run_comparison end
 components = (
     mandatory = (
         run_primary_generative = (
-            "Primary generative model returns a `Tuple`" => args::Arguments -> run_primary_generative(args.model) isa
+            "Primary generative model returns a `Tuple`" => args::Arguments -> run_primary_generative(args.generator) isa
                                                                                NamedTuple,
-            "Primary generative model has two keys: `(:primary_target, :primary_sample)`" => args::Arguments -> keys(run_primary_generative(args.model)) ==
+            "Primary generative model has two keys: `(:primary_target, :primary_sample)`" => args::Arguments -> keys(run_primary_generative(args.generator)) ==
                                                                                                                 (
                 :primary_target, :primary_sample)
         ),
         run_secondary_generative = (
             "Secondary generative model returns a `Tuple` or `NamedTuple`" => args::Arguments -> run_secondary_generative(
-            args.model, args.primary_sample, args.n) isa Union{Tuple, NamedTuple},
+            args.generator, args.primary_sample, args.n) isa Union{Tuple, NamedTuple},
         ),
         run_comparison = (
             "Comparison method returns a `Tuple` or `NamedTuple`" => args::Arguments -> run_comparison(
-            args.model, args.n, args.n_comparisons) isa Union{Tuple, NamedTuple},
+            args.generator, args.n, args.n_comparisons) isa Union{Tuple, NamedTuple},
         )
     ),
     optional = (;)
