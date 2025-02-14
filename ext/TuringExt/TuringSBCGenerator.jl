@@ -1,11 +1,13 @@
-@kwdef struct TuringGenerator{M <: Turing.Model} <: AbstractGenerator
-    model::M
-    condition = (;)
-end
+# @kwdef struct TuringGenerator{M <: Turing.Model, N <: NamedTuple} <: AbstractGenerator
+#     model::M
+#     condition::N = (;)
+# end
 
-struct TuringSBCGenerator{A <: Sampleable, B <: Sampleable} <: AbstractDualGenerator
+
+struct TuringSBCGenerator{A <: Turing.Model, B <: Turing.Model, T <: Tuple{Vararg{Symbol}}} <: AbstractDualGenerator
     primary_generator::A
     secondary_generator::B
+    condition_names::T
 end
 
 """
