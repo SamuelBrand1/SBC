@@ -3,8 +3,32 @@
 ![GitHub CI](https://github.com/SamuelBrand1/SBC/actions/workflows/test.yaml/badge.svg)
 
 This package provides tools for performing simulation-based calibration (SBC) on generative models.
-Out-of-the-box, it provides tools for comparing generative univariate distributions, but
-it can be extended to other types of random sampling, namely full simulation based calibration of `Turing.jl` models.
+Out-of-the-box, it provides tools for calibrating generative/simulated univariate distributions to a target distribution.
+The key assumption is that the target distribution is _also_ a generative model, i.e. we can only sample from it.
+`SBC` is designed to be extensible to other types of generative models via `SBCInterface`.
+See [Interfaces.jl](https://github.com/rafaqz/Interfaces.jl) for more information on how interfaces work.
+
+## Installation
+The package is not yet registered, so you can install it via the following command:
+```julia
+] add https://github.com/SamuelBrand1/SBC
+```
+
+````julia
+# Core theoretical result
+````
+
+The core theoretical result is [Theorem 1](https://arxiv.org/abs/1804.06788), given a generative model
+for a joint distribution $\pi(\theta, y)$, with $\tilde{\theta} \sim \pi(\theta)$, $\tilde{y} \sim \pi(y|\tilde{\theta})$, and
+$\{\theta_1,\dots,\theta_L\} \sim \pi(\theta|y)$, then the rank statistics of the $\theta_i$ are discrete uniformly distributed
+on $\{0,\dots,L\}$. The rank statistics are defined as any map $f$ of a (possibly multivariate) sample to a scalar value.
+```math
+  r(\{f(\theta_1),\dots,f(\theta_L)\}, f(\tilde{\theta})) = \sum_{i=1}^L \mathbb{1}_{f(\theta_i) \leq f(\theta)}.
+```
+
+Using `SBCInterface` the simulation-based calibration (SBC) concept can be extended to other types of random sampling.
+The most important use case is Bayesian (prior) SBC, where the target distribution is a prior distribution of each
+parameter in a Bayesian model, which we can sample from. The generative model is the likelihood function, which is used to generate data.
 
 Extensions have to comply with the `SBCInterface` provided by `SBC.jl` using `Interfaces.jl`.
 At the moment this is very lightweight:
@@ -14,10 +38,15 @@ Required methods:
 - `run_comparison`: This runs both the methods above sequentially `n_comparison` times, and gathers the rank statistics. By default these get
 passed to the `uniformity_test` function to return a Chi-squared test result.
 
-## Example
-In this example, we define a form of Normal distribution that has no distributional knowledge,
+## Example: Comparing two distributions via sampling
+In this example, we will compare two distributions only by sampling from them. That is we check the
+calibration of one sampling distribution against another "true" or target distribution, which we
+also can only sample from.
+
+Towards this we define a form of Normal distribution that has no distributional knowledge,
 but can be sampled from. We make this a subtype of the `Distributions.Sampleable` type and provide
-the necessary methods.
+the necessary methods. Obviously, for Normal distributions we _do_ have distributional knowledge,
+but this is for illustrative purposes since often we may not have this knowledge.
 
 ````julia
 using SBC, Distributions, HypothesisTests, Random
@@ -37,13 +66,6 @@ function Random.rand!(rng::AbstractRNG, s::SampleNormal, x::Vector)
     @. x = s.μ + s.σ * ϵ
     return x
 end
-````
-
-````
-Precompiling SBC...
-   1077.4 ms  ✓ SBC
-  1 dependency successfully precompiled in 1 seconds. 68 already precompiled.
-
 ````
 
 Now we can define a `CompareDistGenerator` that will compare two `SampleNormal` distributions.
@@ -114,7 +136,8 @@ Details:
 
 We do indeed see strong evidence that the two distributions are different.
 
+## Example: Comparing t
+
 ---
 
 *This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
-
