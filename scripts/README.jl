@@ -87,27 +87,71 @@ results_diff.test_results
 
 # We do indeed see strong evidence that the two distributions are different.
 
-# ## Example: using SBC with a Turing model
+# ## Example: using SBC with `Turing.jl` for the eight schools model
 # We use the `Turing` extension to `SBC` which has an interface for running SBC on a `Turing` model.
 # This is a Bayesian model, where the target distribution is the prior distribution of the parameters.
+#
+# The eight schools example is a classic example of using partial pooling to share inferential strength between groups, cf Gelman *et al* [@gelman2013]:
+#
+# > *A study was performed for the Educational Testing Service to analyze the effects of special coaching programs for SAT-V (Scholastic Aptitude Test-Verbal) in each of eight high schools. The outcome variable in each study was the score on a special administration of the SAT-V, a standardized multiple choice test administered by the Educational Testing Service and used to help colleges make admissions decisions; the scores can vary between 200 and 800, with mean about 500 and standard deviation about 100. The SAT examinations are designed to be resistant to short-term efforts directed specifically toward improving performance on the test; instead they are designed to reflect knowledge acquired and abilities developed over many years of education. Nevertheless, each of the eight schools in this study considered its short-term coaching program to be very successful at increasing SAT scores. Also, there was no prior reason to believe that any of the eight programs was more effective than any other or that some were more similar in effect to each other than to any other.*
+#
+# The statistical model for the SAT scores in each of the $J=8$ schools $y_j$ is:
+# ```math
+# \begin{aligned}
+# \mu & \sim \mathcal{N}(0, 5), \\
+# \tau & \sim \text{HalfCauchy}(5),\\
+# \theta_j & \sim \mathcal{N}(\mu, \tau),~ j = 1,\dots,J, \\
+# y_j & \sim \mathcal{N}(\theta_j,\sigma_j),~ j = 1,\dots,J.
+# \end{aligned}
+# ```
+#
+# Where the the SAT standard deviations per high school $\sigma_j$ are treated as known along with the scores.
+#
+# Gelman *et al* _Bayesian Data Analysis_ (2013) use the eight schools example to illustrate partial pooling, and to demonstrate the importance of choosing the variance priors carefully.
 
 using Turing
 
 J = 8
 sigma = [15.0, 10.0, 16.0, 11.0, 9.0, 11.0, 10.0, 18.0]
-@model function eight_schools(J, sigma)
+@model function eight_schools(J, sigma, tau_prior)
     mu ~ Normal(0, 5)
-    tau ~ truncated(Normal(0, 5), lower = 0)
+    tau ~ tau_prior
     theta ~ filldist(Normal(mu, tau), J)
     y ~ MvNormal(theta, sigma)
 end
 
-model = eight_schools(J, sigma)
+model_bad_prior = eight_schools(J, sigma, truncated(Cauchy(0, 5), 0, Inf))
+
+# Where we have chosen the prior for $\tau$ to be a half-Cauchy distribution with scale 5.0.
+# as per [here](https://github.com/pyro-ppl/numpyro#a-simple-example---8-schools).
+# We also have to define the condition names, which are the names of the random variables that
+# will be treated as observed data. In this case, we only have one, the `y` variable.
+
 condition_names = (:y,)
+
+# We also specify the sampler to use, in this case, we will use the No-U-Turn Sampler (NUTS)
+# with Turing defaults.
+
 sampler = NUTS()
 
-eight_school_generator = sbc_generator(model, condition_names, sampler)
-n = 10
+# We can now generate a `SBCGenerator` object for the eight schools model with the bad prior.
+
+eight_school_generator = sbc_generator(model_bad_prior, condition_names, sampler)
+n = 100
 n_comparisons = 100
 results = run_comparison(eight_school_generator, n, n_comparisons)
-results.test_results.mu
+results.test_results.tau
+
+# We can see that the SBC has identified a problem with the model. The Bayesian inference highly likely to be mis-estimating the inter-school variation parameter $\tau$.
+# This is probably due to sensitivity of the model to the prior on $\tau$ (cf Gelman *et al*).
+#
+# Lets use a more informative prior from [this implementation](https://www.tensorflow.org/probability/examples/Eight_Schools).
+
+model_better_prior = eight_schools(J, sigma, LogNormal(5, 1))
+eight_school_generator = sbc_generator(model_better_prior, condition_names, sampler)
+n = 100
+n_comparisons = 100
+results = run_comparison(eight_school_generator, n, n_comparisons)
+results.test_results.tau
+
+# We see that the SBC has not identified a problem with recovering the inter-group variation parameter in the model.
