@@ -29,7 +29,18 @@ end
 end
 
 # Test the run_comparison function
-@testitem "run_comparison" setup=[TestModel1] begin
+@testitem "run_comparison: scalar dists" setup=[TestModel1] begin
+    turing_generator = sbc_generator(turing_model, condition_names, sampler)
+    n = 10
+    n_comparisons = 10
+    results = run_comparison(turing_generator, n, n_comparisons)
+    rank_length_bools = map(results.rank_statistics) do rank
+        length(rank) == n_comparisons
+    end
+    @test all(rank_length_bools)
+end
+
+@testitem "run_comparison: array dists" setup=[TestModel2] begin
     turing_generator = sbc_generator(turing_model, condition_names, sampler)
     n = 10
     n_comparisons = 10

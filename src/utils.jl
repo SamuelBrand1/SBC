@@ -42,3 +42,48 @@ function _nt_lfold_fn(accumulator_nt, sample_nt)
 
     return new_nt
 end
+
+"""
+    _full_pairs_form(primary::NamedTuple)
+
+Transforms a `NamedTuple` return from `run_primary_generative` method into a vector of pairs,
+where each pair consists of a variable name and its corresponding target value. The function
+handles both scalar values and arrays. For arrays, it generates pairs for each element, with
+the variable names including the indices of the elements. This is an internal function that
+complies with `MCMCChains` naming conventions.
+
+# Arguments
+- `primary::NamedTuple`: A named tuple containing the primary targets.
+
+# Returns
+- `Vector{Pair{Symbol, Any}}`: A vector of pairs, where each pair consists of a variable name (as a `Symbol`) and its corresponding value.
+"""
+function _full_pairs_form(primary::NamedTuple)
+    pairs_form = primary.primary_target |> pairs |> collect # Names of variables whatever shape
+    full_pairs_form = mapreduce(vcat, pairs_form) do p
+        _name = p.first
+        target = p.second
+        var_sizes = size(target)
+        if isempty(var_sizes) # scalar so pass through
+            name = _name
+            return [Pair(name, target)]
+        else # Array so list all indices with MCMCChain names
+            indices_strs_and_targets = map(var_sizes) do s
+                1:s
+            end |>
+                                       iters -> Iterators.product(iters...) |>
+                                                collect |>
+                                                indices -> map(indices) do idx
+                                                    idx_target = getindex(target, idx...)
+                                                    idx_str = "[$(join(idx, ", "))]"
+                                                    (; idx_str, idx_target)
+                                                end
+            all_pairs = mapreduce(vcat, indices_strs_and_targets) do nt
+                name = Symbol(string(_name) * nt.idx_str)
+                return Pair(name, nt.idx_target)
+            end
+            return all_pairs
+        end
+    end
+    return full_pairs_form
+end
