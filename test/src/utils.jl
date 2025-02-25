@@ -62,3 +62,31 @@ end
     # Check the result
     @test result_nt == expected_nt
 end
+
+@testitem "SBC._full_pairs_form basic functionality" begin
+    # Test case 1: Scalar values
+    primary = (primary_target = (a = 1, b = 2),)
+    result = SBC._full_pairs_form(primary)
+    expected = [Pair(:a, 1), Pair(:b, 2)]
+    @test result == expected
+
+    # Test case 2: Array values
+    primary = (primary_target = (a = [1, 2], b = [3, 4]),)
+    result = SBC._full_pairs_form(primary)
+    expected = [Pair(Symbol("a[1]"), 1), Pair(Symbol("a[2]"), 2),
+        Pair(Symbol("b[1]"), 3), Pair(Symbol("b[2]"), 4)]
+    @test result == expected
+
+    # Test case 3: Mixed scalar and array values
+    primary = (primary_target = (a = 1, b = [2, 3]),)
+    result = SBC._full_pairs_form(primary)
+    expected = [Pair(:a, 1), Pair(Symbol("b[1]"), 2), Pair(Symbol("b[2]"), 3)]
+    @test result == expected
+
+    # Test case 4: Multi-dimensional array values
+    primary = (primary_target = (a = [1 2; 3 4],),)
+    result = SBC._full_pairs_form(primary)
+    expected = [Pair(Symbol("a[1, 1]"), 1), Pair(Symbol("a[1, 2]"), 2),
+        Pair(Symbol("a[2, 1]"), 3), Pair(Symbol("a[2, 2]"), 4)]
+    @test setdiff(result, expected) |> isempty #invariant test to ordering
+end

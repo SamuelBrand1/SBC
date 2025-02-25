@@ -68,8 +68,8 @@ function SBC.run_comparison(generator::TuringSBCGenerator, n::Int, n_comparisons
         primary = run_primary_generative(generator)
         secondary = run_secondary_generative(generator, primary.primary_sample, n)
         # Collect the rank statistics whilst keeping the variable names
-        pairs_form = primary.primary_target |> pairs |> collect
-        rank_statistic = map(pairs_form) do P
+        full_pairs_form = SBC._full_pairs_form(primary)
+        rank_statistic = map(full_pairs_form) do P
             name = P.first
             target = P.second
             return (name, sum(secondary.samples[name] .< target))
