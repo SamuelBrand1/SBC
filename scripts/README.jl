@@ -145,6 +145,7 @@ results.test_results.tau
 # We can see that the SBC has identified a problem with the model. The Bayesian inference highly likely to be mis-estimating the inter-school variation parameter $\tau$.
 # This is probably due to sensitivity of the model to the prior on $\tau$ (cf Gelman *et al*).
 #
+# ### Fix 1: Use a more informative prior for $\tau$
 # Lets use a more informative prior from [this implementation](https://www.tensorflow.org/probability/examples/Eight_Schools).
 
 model_better_prior = eight_schools(J, sigma, LogNormal(5, 1))
@@ -155,3 +156,24 @@ results = run_comparison(eight_school_generator, n, n_comparisons)
 results.test_results.tau
 
 # We see that the SBC has not identified a problem with recovering the inter-group variation parameter in the model.
+
+# ### Fix 2: Non-centered parameterization
+# An alternative fix is to use a non-centered parameterization of the model.
+# This is a common technique to improve the mixing of the sampler in hierarchical models.
+# We redefine the effect sizes $\theta$ in terms of difference from $\mu$ in units of
+# standard deviations $\tau$:
+
+@model function eight_schools_non_centred(J, sigma, tau_prior)
+    mu ~ Normal(0, 5)
+    tau ~ tau_prior
+    theta ~ filldist(Normal(0, 1), J)
+    effects = mu .+ tau .* theta
+    y ~ MvNormal(effects, sigma)
+end
+
+non_centred_model = eight_schools_non_centred(J, sigma, truncated(Cauchy(0, 5), 0, Inf))
+eight_school_generator = sbc_generator(non_centred_model, condition_names, sampler)
+results = run_comparison(eight_school_generator, n, n_comparisons)
+results.test_results.tau
+
+# We see that this has also addressed the problem with the model.
